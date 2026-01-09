@@ -59,7 +59,6 @@ pipeline {
         }
         always {
             sh 'docker logout || true'
-            sh 'docker rm -f test-flask || true'
         }
     }
 }
