@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello():
-    return 'Hello from Python Flask CI/CD Pipeline - Version 3.0!'
+    return 'Hello from Python Flask CI/CD Pipeline - Version 4.0!'
 
 @app.route('/health')
 def health():
