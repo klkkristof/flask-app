@@ -42,8 +42,7 @@ pipeline {
                 echo 'Deploying Flask app to Kubernetes...'
                 script {
                     sh "kubectl apply -f k8s-deployment.yaml"
-                    sh "kubectl apply -f k8s-service.yaml"
-                    sh "kubectl rollout restart deployment/flask-app"
+                    sh "kubectl set image deployment/flask-app flask-app=${DOCKER_IMAGE}:${IMAGE_TAG}"
                     sh "kubectl rollout status deployment/flask-app --timeout=2m"
                 }
             }
