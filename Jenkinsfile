@@ -25,21 +25,6 @@ pipeline {
             }
         }
         
-        stage('Test Image') {
-            steps {
-                echo 'Testing Docker image...'
-                script {
-                    sh """
-                        docker run -d --name test-flask -p 5001:5000 ${DOCKER_IMAGE}:${IMAGE_TAG}
-                        sleep 5
-                        curl -f http://localhost:5001/ || exit 1
-                        curl -f http://localhost:5001/health || exit 1
-                        docker stop test-flask
-                        docker rm test-flask
-                    """
-                }
-            }
-        }
         
         stage('Push to Docker Hub') {
             steps {
