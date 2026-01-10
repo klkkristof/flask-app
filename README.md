@@ -1,1 +1,1 @@
-This repository is a **learning project** for experimenting with CI/CD pipelines, containerization, and Kubernetes orchestration [web:11][web:13]. The goal is to understand how modern DevOps workflows work by building a complete pipeline
+This repository is a **learning project** for experimenting with CI/CD pipelines, containerization, and Kubernetes orchestration. The goal is to understand and experiment how DevOps workflows work by building a pipeline.
