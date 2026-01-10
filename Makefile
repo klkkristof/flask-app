@@ -7,7 +7,7 @@ NC     := \033[0m
 
 help:
 	@echo ""
-	@echo "  $(YELLOW)make install$(NC)     - Init installation (forst first use)"
+	@echo "  $(YELLOW)make install$(NC)     - Init installation (for first use)"
 	@echo "  $(YELLOW)make start$(NC)       - Minikube start"
 	@echo "  $(YELLOW)make stop$(NC)        - Minikube stop"
 	@echo "  $(YELLOW)make status$(NC)      - Show status"
