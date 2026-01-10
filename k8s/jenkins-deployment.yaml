@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: jenkins
-  namespace: jenkins
+  namespace: devops
 spec:
   replicas: 1
   selector:
@@ -15,31 +15,22 @@ spec:
     spec:
       serviceAccountName: jenkins
       securityContext:
-        fsGroup: 0
+        fsGroup: 1000
       containers:
       - name: jenkins
         image: jenkins/jenkins:lts
-        securityContext:
-          runAsUser: 0
-          privileged: true
         ports:
         - containerPort: 8080
           name: http
         - containerPort: 50000
-          name: jnlp
+          name: agent
         volumeMounts:
-        - name: jenkins-data
+        - name: jenkins-home
           mountPath: /var/jenkins_home
-        - name: docker-sock
-          mountPath: /var/run/docker.sock
         env:
         - name: JAVA_OPTS
           value: "-Djenkins.install.runSetupWizard=false"
       volumes:
-      - name: jenkins-data
+      - name: jenkins-home
         persistentVolumeClaim:
           claimName: jenkins-pvc
-      - name: docker-sock
-        hostPath:
-          path: /var/run/docker.sock
-          type: Socket

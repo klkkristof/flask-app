@@ -1,5 +1,31 @@
 pipeline {
-    agent any
+    agent {
+        kubernetes {
+            yaml """
+apiVersion: v1
+kind: Pod
+metadata:
+  namespace: devops
+spec:
+  containers:
+  - name: docker
+    image: docker:24-dind
+    securityContext:
+      privileged: true
+    volumeMounts:
+    - name: docker-sock
+      mountPath: /var/run
+  - name: kubectl
+    image: bitnami/kubectl:latest
+    command:
+    - cat
+    tty: true
+  volumes:
+  - name: docker-sock
+    emptyDir: {}
+"""
+        }
+    }
     
     environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
@@ -10,15 +36,15 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                echo 'Checking out Python Flask source code...'
+                echo 'Checking out source code...'
                 checkout scm
             }
         }
         
         stage('Build Docker Image') {
             steps {
-                echo 'Building Docker image for Flask app...'
-                script {
+                container('docker') {
+                    echo 'Building Docker image...'
                     sh "docker build -t ${DOCKER_IMAGE}:${IMAGE_TAG} ."
                     sh "docker tag ${DOCKER_IMAGE}:${IMAGE_TAG} ${DOCKER_IMAGE}:latest"
                 }
@@ -28,8 +54,8 @@ pipeline {
         
         stage('Push to Docker Hub') {
             steps {
-                echo 'Pushing Flask image to Docker Hub...'
-                script {
+                container('docker') {
+                    echo 'Pushing to Docker Hub...'
                     sh "echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin"
                     sh "docker push ${DOCKER_IMAGE}:${IMAGE_TAG}"
                     sh "docker push ${DOCKER_IMAGE}:latest"
@@ -39,11 +65,11 @@ pipeline {
         
         stage('Deploy to Kubernetes') {
             steps {
-                echo 'Deploying Flask app to Kubernetes...'
-                script {
-                    sh "kubectl apply -f k8s-deployment.yaml"
-                    sh "kubectl set image deployment/flask-app flask-app=${DOCKER_IMAGE}:${IMAGE_TAG}"
-                    sh "kubectl rollout status deployment/flask-app --timeout=2m"
+                container('kubectl') {
+                    echo 'Deploying to Kubernetes...'
+                    sh "kubectl apply -f k8s-deployment.yaml -n devops"
+                    sh "kubectl set image deployment/flask-app flask-app=${DOCKER_IMAGE}:${IMAGE_TAG} -n devops"
+                    sh "kubectl rollout status deployment/flask-app -n devops --timeout=2m"
                 }
             }
         }
@@ -51,13 +77,15 @@ pipeline {
     
     post {
         success {
-            echo 'Flask Pipeline completed successfully!'
+            echo 'Pipeline completed successfully!'
         }
         failure {
-            echo 'Flask Pipeline failed!'
+            echo 'Pipeline failed!'
         }
         always {
+            container('docker') {
             sh 'docker logout || true'
+            }
         }
     }
 }
