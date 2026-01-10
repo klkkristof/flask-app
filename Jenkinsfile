@@ -72,7 +72,7 @@ spec:
             steps {
                 container('kubectl') {
                     echo 'Deploying to Kubernetes...'
-                    sh "kubectl apply -f k8s/deployment.yaml -n devops"
+                    sh "kubectl apply -f k8s/flask-deployment.yaml -n devops"
                     sh "kubectl set image deployment/flask-app flask-app=${DOCKER_IMAGE}:${IMAGE_TAG} -n devops"
                     sh "kubectl rollout status deployment/flask-app -n devops --timeout=5m --watch=true"
                 }
