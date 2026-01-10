@@ -6,7 +6,6 @@ YELLOW := \033[1;33m
 NC     := \033[0m
 
 help:
-	@echo "$(GREEN)COMMANDS:$(NC)"
 	@echo ""
 	@echo "  $(YELLOW)make install$(NC)     - Init installation (only first use)"
 	@echo "  $(YELLOW)make start$(NC)       - Minikube start"
