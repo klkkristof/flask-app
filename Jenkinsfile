@@ -20,6 +20,11 @@ spec:
     command:
     - cat
     tty: true
+  - name: jnlp
+    image: jenkins/inbound-agent:latest
+    args:
+    - '\$(JENKINS_SECRET)'
+    - '\$(JENKINS_NAME)'
   volumes:
   - name: docker-sock
     emptyDir: {}
